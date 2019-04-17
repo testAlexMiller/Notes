@@ -1,0 +1,16 @@
+# spring配置字符过滤器之后,ajax刷新依旧乱码
+## 原因
+### spring只是利用request.setCharacterEncoding(this.encoding);帮助我们处理了POST方式的乱码问题，碰到GET方式的提交，还是会出现乱码
+## 解决方法
+### spring代码解决
+String username = new String(username.getBytes("ISO-8859-1"), "UTF-8"); //通过默认的编码获取到byte[],然后进行UTF-8再次编码
+### server.xml配置解决
+``` xml
+<Connector URIEncoding="UTF-8" port="8080" protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8443" />
+```
+## 注意
+自从Tomcat5.x开始，就对GET方式和POST方式的提交分别给予不同的处理方式。POST方式是利用request.setCharacterEncoding()来进行设置编码，如果没有设置的话，就是按照默认的ISO-8859-1来进行编码；GET方式提交总是利用默认的ISO-8859-1来进行编码参数。
+
+# 页面ajax请求,报400错误,显示一串请求的url
+## 原因
+### controller中的参数配置和页面请求的不一致导致,检查必输参数是否一致
